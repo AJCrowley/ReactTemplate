@@ -1,0 +1,12 @@
+$bg-color: #ccc;
+
+body {
+	background-color: $bg-color !important;
+	opacity: 0.9;
+}
+
+#root {
+	border-radius: 4px;
+	box-shadow: black 1px 1px 1px;
+	display: flex;
+}

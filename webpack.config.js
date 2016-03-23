@@ -1,5 +1,8 @@
 var path = require('path');
 var webpack = require('webpack');
+var autoprefixer = require('autoprefixer');
+var precss = require('precss');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 		template: __dirname + '/src/template.html',
@@ -20,14 +23,14 @@ var config = {
 	jsloaders: process.env.NODE_ENV === 'production' ? ['babel'] : ['react-hot', 'babel'],
 	plugins: process.env.NODE_ENV === 'production' ?
 		[
-			HTMLWebpackPluginConfig
+			HTMLWebpackPluginConfig,
+			new ExtractTextPlugin('styles.css')
 		] : [
 			HTMLWebpackPluginConfig,
-			new webpack.HotModuleReplacementPlugin()
+			new webpack.HotModuleReplacementPlugin(),
+			new ExtractTextPlugin('styles.css')
 		]
 };
-
-console.log(config.entries);
 
 module.exports = {
 	devtool: 'eval',
@@ -43,6 +46,7 @@ module.exports = {
 				loaders: config.jsloaders,
 				include: path.join(__dirname, 'src')
 			},
+			{test: /\.scss$/, include: __dirname + '/src/scss', loader: ExtractTextPlugin.extract('style-loader', ['css-loader', 'postcss-loader', 'sass-loader'])},
 			{test: /bootstrap\/js\//, loader: 'imports?jQuery=jquery'},
             {test: /\.css$/, loader: 'style-loader!css-loader'},
             {test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff&name=./fonts/[hash].[ext]'},
@@ -50,6 +54,9 @@ module.exports = {
             {test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&&name=./fonts/[hash].[ext]'},
             {test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml&name=./fonts/[hash].[ext]'}
 		]
+	},
+	postcss: function () {
+		return [autoprefixer({browsers: ['last 3 versions']}), precss];
 	},
 	plugins: config.plugins
 };
